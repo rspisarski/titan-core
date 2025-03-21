@@ -7,16 +7,14 @@ export const prerender = true;
 // Get static paths for all possible pages
 export async function getStaticPaths() {
     const allPosts = await getCollection('blog');
-    
+
     // Filter posts
-    const filteredPosts = allPosts.filter(post => {
+    const filteredPosts = allPosts.filter((post) => {
         return import.meta.env.DEV || post.data.publish !== false;
     });
 
     // Sort posts by date
-    const sortedPosts = filteredPosts.sort((a, b) => 
-        b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
-    );
+    const sortedPosts = filteredPosts.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
     const totalPosts = sortedPosts.length;
     const totalPages = Math.ceil(totalPosts / blogSetting.postsPerPage);
@@ -26,14 +24,14 @@ export async function getStaticPaths() {
         const page = i + 2; // Start from page 2
         const start = (page - 1) * blogSetting.postsPerPage;
         const end = start + blogSetting.postsPerPage;
-        
+
         return {
             params: { page: String(page) },
-            props: { 
+            props: {
                 page,
                 totalPages,
-                posts: sortedPosts.slice(start, end)
-            }
+                posts: sortedPosts.slice(start, end),
+            },
         };
     });
 }
@@ -46,10 +44,12 @@ if (page === 1) {
 }
 ---
 
-<PaginatedBlogLayout 
-    posts={posts}
+<PaginatedBlogLayout
+    {posts}
     currentPage={page}
-    totalPages={totalPages}
+    {totalPages}
     baseUrl="/blog"
     title="Blog"
-    subtitle="Latest articles and news from the team" /> 
+    subtitle="Latest articles and news from the team"
+/>
+

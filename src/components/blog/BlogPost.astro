@@ -1,69 +1,80 @@
 ---
-// src/components/BlogPost.astro
 import { categories } from '../../data/categories';
 import HashtagCategory from '../ui/HashtagCategory.astro';
 import Date from '../ui/Date.astro';
 import { Image } from 'astro:assets';
 
 interface Props {
-  title: string;
-  excerpt: string;
-  featuredImage: any; // Changed to accept ImageMetadata from content collections
-  publishDate: Date;
-  categories: string[];
-  content: string;
-  slug?: string;
-  index: number;
+    title: string;
+    excerpt: string;
+    featuredImage: any; // Changed to accept ImageMetadata from content collections
+    publishDate: Date;
+    categories: string[];
+    slug?: string;
+    index: number;
 }
 
 const { title, excerpt, featuredImage, publishDate, categories: postCategories, slug, index } = Astro.props;
 
 // Validate categories against the valid categories
-const validCategories = postCategories.filter((categoryName: string) => 
-  categories.some(category => category.name === categoryName)
+const validCategories = postCategories.filter((categoryName: string) =>
+    categories.some((category) => category.name === categoryName),
 );
 ---
 
-<a 
-  href={`/blog/${slug}`} 
-  class="group flex flex-col h-full overflow-hidden bg-white rounded-lg border border-black transition-all duration-300 hover:border-primary"
-  data-aos="fade-up"
-  data-aos-delay={index * 100}
+<a
+    href={`/blog/${slug}`}
+    class="group flex flex-col h-full overflow-hidden bg-white rounded-lg border border-black transition-all duration-300 hover:border-primary"
+    data-aos="fade-up"
+    data-aos-delay={index * 100}
 >
-  <div class="relative aspect-[16/9] overflow-hidden border-black border-b group-hover:border-primary transition-colors duration-300">
-    {featuredImage && (
-      <Image 
-        src={featuredImage}
-        alt={title}
-        width={600}
-        height={338}
-        class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-      />
-    )}
-    <div class="absolute inset-0 bg-primary opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-  </div>
-  
-  <div class="py-4 px-4 flex flex-col flex-grow relative">
-    <!-- Date at the top -->
-    <div class="text-sm text-gray-600 mb-3 group-hover:text-primary/80 transition-colors duration-300">
-      <Date date={publishDate} />
+    <div
+        class="relative aspect-[16/9] overflow-hidden border-black border-b group-hover:border-primary transition-colors duration-300"
+    >
+        {
+            featuredImage && (
+                <Image
+                    src={featuredImage}
+                    alt={title}
+                    width={600}
+                    height={338}
+                    class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                />
+            )
+        }
+        <div class="absolute inset-0 bg-primary opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
-      {title}
-    </h2>
-    
-    <p class="mt-2 mb-8 text-body-base line-clamp-4 flex-grow text-small group-hover:text-gray-700 transition-colors duration-300">
-      {excerpt}
-    </p>
-    
-    <!-- Categories as hashtags at the bottom -->
-    <div class="absolute bottom-4 left-4 flex flex-wrap">
-      {validCategories.map(categoryName => (
-        <div onclick="event.stopPropagation()">
-          <HashtagCategory category={categoryName} />
+    <div class="py-4 px-4 flex flex-col flex-grow relative">
+        <!-- Date at the top -->
+        <div class="text-sm text-gray-600 mb-3 group-hover:text-primary/80 transition-colors duration-300">
+            <Date date={publishDate} />
         </div>
-      ))}
+
+        <h2 class="text-xl font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
+            {title}
+        </h2>
+
+        <p
+            class="mt-2 mb-8 text-body-base line-clamp-4 flex-grow text-small group-hover:text-gray-700 transition-colors duration-300"
+        >
+            {excerpt}
+        </p>
+
+        <!-- Categories as hashtags at the bottom -->
+        <div class="absolute bottom-4 left-4 flex flex-wrap">
+            {
+                validCategories.map((categoryName) => (
+                    <div class="category-tag">
+                        <HashtagCategory category={categoryName} />
+                    </div>
+                ))
+            }
+        </div>
     </div>
-  </div>
 </a>
+<script>
+    document
+        .querySelectorAll('div.category-tag')
+        .forEach((e) => e.addEventListener('click', (event) => event.stopPropagation()));
+</script>

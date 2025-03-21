@@ -6,42 +6,44 @@ import InnerHero from '../../components/sections/InnerHero.astro';
 const legalEntries = await getCollection('legal');
 
 // Sort entries by title
-const sortedEntries = legalEntries.sort((a, b) => 
-  a.data.title.localeCompare(b.data.title)
-);
+const sortedEntries = legalEntries.sort((a, b) => a.data.title.localeCompare(b.data.title));
 
 // Hero content
 const heroContent = {
-  title: "Legal Information",
-  description: "Important policies and terms governing the use of our services",
-  overlayOpacity: 0.8
+    title: 'Legal Information',
+    description: 'Important policies and terms governing the use of our services',
+    overlayOpacity: 0.8,
 };
 ---
 
 <Layout title="Legal Information">
-  <InnerHero content={heroContent} />
-  
-  <section class="py-small">
-    <div class="site-container px-8">
-      <div class="space-y-6">
-        {sortedEntries.map((entry) => {
-          // Format the last updated date
-          const formattedDate = new Intl.DateTimeFormat('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          }).format(entry.data.lastUpdated);
-          
-          return (
-            <div class="border-b border-body-base/10 pb-6">
-              <a href={`/legal/${entry.slug}`} class="group">
-                <h2 class="text-medium group-hover:text-accent transition-colors">{entry.data.title}</h2>
-                <p class="text-sm text-body-base/80 mt-2">Last updated: {formattedDate}</p>
-              </a>
+    <InnerHero content={heroContent} />
+
+    <section class="py-small">
+        <div class="site-container px-8">
+            <div class="space-y-6">
+                {
+                    sortedEntries.map((entry) => {
+                        // Format the last updated date
+                        const formattedDate = new Intl.DateTimeFormat('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        }).format(entry.data.lastUpdated);
+
+                        return (
+                            <div class="border-b border-body-base/10 pb-6">
+                                <a href={`/legal/${entry.id}`} class="group">
+                                    <h2 class="text-medium group-hover:text-accent transition-colors">
+                                        {entry.data.title}
+                                    </h2>
+                                    <p class="text-sm text-body-base/80 mt-2">Last updated: {formattedDate}</p>
+                                </a>
+                            </div>
+                        );
+                    })
+                }
             </div>
-          );
-        })}
-      </div>
-    </div>
-  </section>
-</Layout> 
+        </div>
+    </section>
+</Layout>

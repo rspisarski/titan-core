@@ -1,20 +1,20 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Layout from '@layouts/Layout.astro';
 import CategoryPill from '@components/ui/CategoryPill.astro';
 import Date from '@components/ui/Date.astro';
 import { Image } from 'astro:assets';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map(post => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+    const posts = await getCollection('blog');
+    return posts.map((post) => ({
+        params: { slug: post.id },
+        props: { post },
+    }));
 }
 
 const { post } = Astro.props;
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 // Use SEO data from frontmatter if available, fallback to regular post data
 const seoTitle = post.data.seo?.title || post.data.title;
@@ -26,68 +26,69 @@ let seoImage: string | undefined = post.data.seo?.image;
 
 // If seoImage is provided but not an absolute URL, make it absolute
 if (seoImage && !seoImage.startsWith('http')) {
-  const siteUrl = import.meta.env.SITE || 'https://titan-core.vercel.app';
-  seoImage = new URL(seoImage.startsWith('/') ? seoImage : `/${seoImage}`, siteUrl).toString();
+    const siteUrl = import.meta.env.SITE || 'https://titan-core.vercel.app';
+    seoImage = new URL(seoImage.startsWith('/') ? seoImage : `/${seoImage}`, siteUrl).toString();
 }
-// If no SEO image is specified but we have a featured image, use its URL
+// If no SEO image is specified, but we have a featured image, use its URL
 else if (!seoImage && post.data.featuredImage) {
-  // For Astro image objects, we need to create an absolute URL
-  const siteUrl = import.meta.env.SITE || 'https://titan-core.vercel.app';
-  seoImage = new URL(post.data.featuredImage.src, siteUrl).toString();
+    // For Astro image objects, we need to create an absolute URL
+    const siteUrl = import.meta.env.SITE || 'https://titan-core.vercel.app';
+    seoImage = new URL(post.data.featuredImage.src, siteUrl).toString();
 }
 ---
 
-<Layout 
-  title={seoTitle}
-  description={seoDescription}
-  image={seoImage}
->
-
-  <div class="w-full h-120 absolute top-0 left-0 z-0 overflow-hidden border-b border-black">
-    {post.data.featuredImage && (
-      <>
-        <Image 
-          src={post.data.featuredImage} 
-          alt={post.data.title} 
-          width={1920}
-          height={1080}
-          class="w-full h-full object-cover grayscale opacity-20" 
-          quality={60}
-        />
-        <div class="absolute inset-0 bg-primary/10 backdrop-blur-md"></div>
-      </>
-    )}
-  </div>
-  
-  <article class="site-container--small mx-auto px-4 prose relative z-10 pb-base">
-    <div class="mt-42 mb-12 text-center">
-      <h1>{post.data.title}</h1>
-      <div class="flex items-center justify-center gap-4 text-gray-600">
-        <Date date={post.data.publishDate} />
-        {post.data.categories && (
-          <div class="flex flex-wrap gap-2">
-            {post.data.categories.map((category) => (
-              <CategoryPill category={category} />
-            ))}
-          </div>
-        )}
-      </div>
+<Layout title={seoTitle} description={seoDescription} image={seoImage}>
+    <div class="w-full h-120 absolute top-0 left-0 z-0 overflow-hidden border-b border-black">
+        {
+            post.data.featuredImage && (
+                <>
+                    <Image
+                        src={post.data.featuredImage}
+                        alt={post.data.title}
+                        width={1920}
+                        height={1080}
+                        class="w-full h-full object-cover grayscale opacity-20"
+                        quality={60}
+                    />
+                    <div class="absolute inset-0 bg-primary/10 backdrop-blur-md" />
+                </>
+            )
+        }
     </div>
 
-    {post.data.featuredImage && (
-      <Image 
-        src={post.data.featuredImage} 
-        alt={post.data.title} 
-        width={1200}
-        height={675}
-        class="w-full h-auto rounded-lg border mb-12 border-black" 
-        quality={80}
-        format="webp"
-      />
-    )}
+    <article class="site-container--small mx-auto px-4 prose relative z-10 pb-base">
+        <div class="mt-42 mb-12 text-center">
+            <h1>{post.data.title}</h1>
+            <div class="flex items-center justify-center gap-4 text-gray-600">
+                <Date date={post.data.publishDate} />
+                {
+                    post.data.categories && (
+                        <div class="flex flex-wrap gap-2">
+                            {post.data.categories.map((category) => (
+                                <CategoryPill category={category} />
+                            ))}
+                        </div>
+                    )
+                }
+            </div>
+        </div>
 
-    <div class="mt-8">
-      <Content />
-    </div>
-  </article>
+        {
+            post.data.featuredImage && (
+                <Image
+                    src={post.data.featuredImage}
+                    alt={post.data.title}
+                    width={1200}
+                    height={675}
+                    class="w-full h-auto rounded-lg border mb-12 border-black"
+                    quality={80}
+                    format="webp"
+                />
+            )
+        }
+
+        <div class="mt-8">
+            <Content />
+        </div>
+    </article>
 </Layout>

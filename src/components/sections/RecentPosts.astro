@@ -25,22 +25,16 @@ export interface Props {
     category?: string;
 }
 
-const {
-    content,
-    background = 'base',
-    postsToShow = 3,
-    category,
-} = Astro.props;
+const { content, background = 'base', postsToShow = 3, category } = Astro.props;
 
 // Get background and text colors
 const bgColor = getBackgroundColor(background);
 const textColor = getTextColor(background);
-const paddingClass = getPaddingClass({ 
+const paddingClass = getPaddingClass({
     padding: Astro.props.padding,
     paddingTop: Astro.props.paddingTop,
-    paddingBottom: Astro.props.paddingBottom 
+    paddingBottom: Astro.props.paddingBottom,
 });
-
 
 // Fetch posts
 const allPosts = await getCollection('blog', ({ data }) => {
@@ -49,66 +43,57 @@ const allPosts = await getCollection('blog', ({ data }) => {
 
 // Filter and sort posts
 let filteredPosts = allPosts
-    .filter(post => !category || post.data.categories.includes(category))
+    .filter((post) => !category || post.data.categories.includes(category))
     .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime())
     .slice(0, postsToShow);
 ---
 
-<section class:list={["relative", bgColor, paddingClass]}>
+<section class:list={['relative', bgColor, paddingClass]}>
     <div class="site-container px-4">
-        {(content?.title || content?.description) && (
-            <div class="max-w-2xl mb-12">
-                {content?.eyebrow && (
-                    <Eyebrow 
-                        text={content.eyebrow} 
-                        background={background} 
-                    />
-                )}
-                {content?.title && (
-                    <h2 class:list={[textColor]} data-aos="fade-up">
-                        {content.title}
-                    </h2>
-                )}
-                {content?.description && (
-                    <p class:list={["mt-4", textColor, "opacity-90"]} data-aos="fade-up" data-aos-delay="100">
-                        {content.description}
-                    </p>
-                )}
-                {content?.button && (
-                    <div class="mt-8" data-aos="fade-up" data-aos-delay="200">
-                        <Button
-                            href={content.button.link}
-                            variant={content.button.variant || 'primary'}
-                        >
-                            {content.button.text}
-                        </Button>
-                    </div>
-                )}
-            </div>
-        )}
+        {
+            (content?.title || content?.description) && (
+                <div class="max-w-2xl mb-12">
+                    {content?.eyebrow && <Eyebrow text={content.eyebrow} background={background} />}
+                    {content?.title && (
+                        <h2 class:list={[textColor]} data-aos="fade-up">
+                            {content.title}
+                        </h2>
+                    )}
+                    {content?.description && (
+                        <p class:list={['mt-4', textColor, 'opacity-90']} data-aos="fade-up" data-aos-delay="100">
+                            {content.description}
+                        </p>
+                    )}
+                    {content?.button && (
+                        <div class="mt-8" data-aos="fade-up" data-aos-delay="200">
+                            <Button href={content.button.link} variant={content.button.variant || 'primary'}>
+                                {content.button.text}
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )
+        }
 
         <div class="posts-grid">
-            {filteredPosts.map((post, index) => (
-                <div>
-                    <BlogPost 
-                        title={post.data.title}
-                        excerpt={post.data.excerpt}
-                        featuredImage={post.data.featuredImage}
-                        publishDate={post.data.publishDate}
-                        categories={post.data.categories || []}
-                        content={post.body}
-                        slug={post.slug}
-                        index={index}
-                    />
-                </div>
-            ))}
+            {
+                filteredPosts.map((post, index) => (
+                    <div>
+                        <BlogPost
+                            title={post.data.title}
+                            excerpt={post.data.excerpt}
+                            featuredImage={post.data.featuredImage}
+                            publishDate={post.data.publishDate}
+                            categories={post.data.categories || []}
+                            slug={post.id}
+                            index={index}
+                        />
+                    </div>
+                ))
+            }
         </div>
 
-        {filteredPosts.length === 0 && (
-            <p class="text-center text-gray-500 py-8">
-                No posts found.
-            </p>
-        )}
+        {filteredPosts.length === 0 && <p class="text-center text-gray-500 py-8">No posts found.</p>}
     </div>
 </section>
 

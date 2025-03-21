@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Layout from '@layouts/Layout.astro';
 import InnerHero from '@components/sections/InnerHero.astro';
 import MobileProfile from '@components/team/MobileProfile.astro';
@@ -8,13 +8,13 @@ import DesktopProfile from '@components/team/DesktopProfile.astro';
 export async function getStaticPaths() {
   const teamEntries = await getCollection('team');
   return teamEntries.map(entry => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
     props: { entry },
   }));
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 const heroContent = {
   title: entry.data.name,
   description: entry.data.jobTitle,
@@ -37,7 +37,7 @@ const heroContent = {
           </div>
         </div>
       </div>
-      
+
       <!-- Main Content -->
       <div class="lg:col-span-2 py-base">
         <article>
@@ -46,4 +46,4 @@ const heroContent = {
       </div>
     </div>
   </div>
-</Layout> 
+</Layout>

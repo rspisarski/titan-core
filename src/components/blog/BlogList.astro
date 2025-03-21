@@ -5,78 +5,83 @@ import { categories } from '../../data/categories';
 import { getCollection } from 'astro:content';
 
 interface Props {
-  posts: CollectionEntry<'blog'>[];
-  currentCategory?: string;
+    posts: CollectionEntry<'blog'>[];
+    currentCategory?: string;
 }
 
 const { posts, currentCategory } = Astro.props;
 
 // Get all posts to determine active categories
 const allPosts = await getCollection('blog', ({ data }) => {
-  return import.meta.env.DEV || data.publish !== false;
+    return import.meta.env.DEV || data.publish !== false;
 });
 
 // Filter to only show categories that have posts
-const activeCategories = categories.filter(category => 
-  allPosts.some(post => post.data.categories?.includes(category.name))
+const activeCategories = categories.filter((category) =>
+    allPosts.some((post) => post.data.categories?.includes(category.name)),
 );
 ---
-<section class="site-container mx-auto px-4 py-base">
-  <div class="mb-16 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6" data-aos="fade-in" data-aos-delay="100">
-    
-    <div class="w-full">
-      <h2 class="text-lg font-semibold mb-4">Filter by Categories:</h2>
-      <div class="flex flex-wrap gap-2">
-        <a 
-          href="/blog" 
-          class={`px-4 sm:px-6 py-2 sm:py-3 leading-none rounded-md text-small flex items-center justify-center transition-colors border border-primary duration-200 ${
-            !currentCategory 
-              ? 'bg-primary text-body-dark shadow-md' 
-              : 'bg-background text-body-base hover:bg-background-light hover:text-body-light'
-          }`}
-        >
-          Show All
-        </a>
-        {activeCategories.map((category) => (
-          <a 
-            href={`/category/${category.slug}`}
-            class={`px-4 sm:px-6 py-2 sm:py-3 leading-none rounded-md text-small flex items-center justify-center transition-colors border border-primary duration-200 ${
-              currentCategory === category.name 
-                ? 'bg-primary text-body-dark shadow-md' 
-                : 'bg-background text-body-base hover:bg-background-light hover:text-body-light'
-            }`}
-            title={category.description}
-          >
-            {category.name}
-          </a>
-        ))}
-      </div>
-    </div>
-    <p class="text-small text-body-base text-left sm:text-right whitespace-nowrap">
-      Showing <span class="font-bold text-primary">{posts.length}</span> of <span class="font-bold text-primary">{allPosts.length}</span> posts
-    </p>
-  </div>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {posts.map((post, index) => (
-      <div>
-        <BlogPost 
-          title={post.data.title}
-          excerpt={post.data.excerpt}
-          featuredImage={post.data.featuredImage || ''}
-          publishDate={post.data.publishDate}
-          categories={post.data.categories || []}
-          content={post.body}
-          slug={post.slug}
-          index={index}
-        />
-      </div>
-    ))}
-  </div>
 
-  {posts.length === 0 && (
-    <p class="text-center text-gray-500 py-8">
-      No posts found in this category.
-    </p>
-  )}
+<section class="site-container mx-auto px-4 py-base">
+    <div
+        class="mb-16 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6"
+        data-aos="fade-in"
+        data-aos-delay="100"
+    >
+        <div class="w-full">
+            <h2 class="text-lg font-semibold mb-4">Filter by Categories:</h2>
+            <div class="flex flex-wrap gap-2">
+                <a
+                    href="/blog"
+                    class={`px-4 sm:px-6 py-2 sm:py-3 leading-none rounded-md text-small flex items-center justify-center transition-colors border border-primary duration-200 ${
+                        !currentCategory
+                            ? 'bg-primary text-body-dark shadow-md'
+                            : 'bg-background text-body-base hover:bg-background-light hover:text-body-light'
+                    }`}
+                >
+                    Show All
+                </a>
+                {
+                    activeCategories.map((category) => (
+                        <a
+                            href={`/category/${category.slug}`}
+                            class={`px-4 sm:px-6 py-2 sm:py-3 leading-none rounded-md text-small flex items-center justify-center transition-colors border border-primary duration-200 ${
+                                currentCategory === category.name
+                                    ? 'bg-primary text-body-dark shadow-md'
+                                    : 'bg-background text-body-base hover:bg-background-light hover:text-body-light'
+                            }`}
+                            title={category.description}
+                        >
+                            {category.name}
+                        </a>
+                    ))
+                }
+            </div>
+        </div>
+        <p class="text-small text-body-base text-left sm:text-right whitespace-nowrap">
+            Showing <span class="font-bold text-primary">{posts.length}</span> of <span class="font-bold text-primary"
+                >{allPosts.length}</span
+            > posts
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {
+            posts.map((post, index) => (
+                <div>
+                    <BlogPost
+                        title={post.data.title}
+                        excerpt={post.data.excerpt}
+                        featuredImage={post.data.featuredImage || ''}
+                        publishDate={post.data.publishDate}
+                        categories={post.data.categories || []}
+                        slug={post.id}
+                        index={index}
+                    />
+                </div>
+            ))
+        }
+    </div>
+
+    {posts.length === 0 && <p class="text-center text-gray-500 py-8">No posts found in this category.</p>}
 </section>
